@@ -5,7 +5,9 @@ const auth = require('./auth')
 function route(app) {
     app.use('/api/v1/auth', auth)
     
-    app.use('/api/v1/', site)// default
+    // default
+    app.use('/api/v1/', site)
+    app.use('/', site)
 }
 
 module.exports = route

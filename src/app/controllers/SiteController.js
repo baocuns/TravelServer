@@ -4,18 +4,23 @@ const Admin = require('../models/Admin')
 
 class SiteController {
 
-    // [GET] /home
+    // [GET] /
     index(req, res, next) {
-        Admin.find()
-            .then(result => res.json(result))
+        Admin.findOne({
+            name: 'admin'
+        })
+            .then(result => {
+                const { name, messages } = result
+                res.status(200).json({name, messages})
+            })
             .catch(next)
     }
 
-    // [POST] /add
-    async add(req, res) {
+    // [POST] /store
+    async store(req, res) {
         const admin = await new Admin({
-            name: 'son',
-            messages: 'xau nhu ma',
+            name: 'admin',
+            messages: 'Why did you get lost here? Why?',
         })
 
         const result = await admin.save()
