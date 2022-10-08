@@ -1,26 +1,23 @@
 const path = require('path')
 const express = require('express')
-const session = require('express-session')
 require('dotenv').config()
+const cookieParser = require('cookie-parser')
 
 const app = express()
 const port = 3000
+app.use(cookieParser())
 
 const route = require('./routes')
+const db = require('./database/config/config')
+
+//connect db
+db.connect()
 
 // Middleware
 app.use(express.urlencoded({
   extended: true
 }))
 app.use(express.json())
-
-
-// Session
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-}))
 
 // route
 route(app)

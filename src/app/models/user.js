@@ -1,30 +1,31 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+const mongoose = require('mongoose')
+
+const User = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 20,
+        unique: true
+    },
+    email: {
+        type: String,
+        required: true,
+        minlength: 10,
+        maxlength: 50,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true,
+        minlength: 6
+    },
+    admin: {
+        type: Boolean,
+        default: false
     }
-  }
-  User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
-    username: DataTypes.STRING,
-    password: DataTypes.STRING,
-    phone: DataTypes.STRING,
-    image: DataTypes.TEXT,
-    roles: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
-  return User;
-};
+}, {
+    timestamps: true
+})
+
+module.exports = mongoose.model("User", User)
