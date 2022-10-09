@@ -1,10 +1,5 @@
 const mongoose = require('mongoose')
 
-const location = {
-    longitude: 0,
-    latitude: 0,
-}
-
 const Event = new mongoose.Schema({
     title: {
         type: String,
@@ -29,9 +24,13 @@ const Event = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    location: {
-        type: location,
-        default: {}
+    longitude: {
+        type: Number,
+        required: true,
+    },
+    latitude: {
+        type: Number,
+        required: true,
     },
     slug: {
         type: String,
