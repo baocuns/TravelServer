@@ -150,7 +150,7 @@ const EventController = {
                 }
 
                 // so sanh < 50KM
-                event.filter(e => EventController.calcCrow(req.location.longitude, req.location.latitude, e.longitude, e.latitude) < 50)
+                event.filter(e => EventController.calcCrow(req.location.longitude, req.location.latitude, e.longitude, e.latitude) < req.location.diameter)
 
                 return res.status(200).json({
                     code: 0,

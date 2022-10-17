@@ -86,6 +86,7 @@ const EventMiddleware = {
         const latitude_min = parseFloat(latitude) - parseFloat(((diameter / 50) * 0.8985).toFixed(5))
 
         req.location = {
+            diameter,
             limit,
             skip,
             longitude,
