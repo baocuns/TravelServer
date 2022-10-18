@@ -31,6 +31,19 @@ const SiteMiddleware = {
         }
 
         next()
+    },
+    photosMongodb(req, res, next) {
+        const slug = req.params.slug
+        if (!slug) {
+            return res.status(404).json({
+                code: 0,
+                status: false,
+                msg: 'value is not exist!',
+            })
+        }
+
+        req.slug = slug
+        next()
     }
 }
 

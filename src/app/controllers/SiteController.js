@@ -2,6 +2,7 @@
 const Admin = require('../models/Admin')
 const path = require('path');
 const fs = require("fs");
+const Photos = require('../models/Photos')
 
 
 class SiteController {
@@ -55,6 +56,25 @@ class SiteController {
                 err: err
             })
         }
+    }
+
+    // views/photos/:slug
+    photosMongodb(req, res) {
+        Photos.findOne({
+            title: req.params.slug,
+        })
+            .then(photos => {
+                res.contentType(photos.typeof);
+                return res.send(photos.img)
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'image is not exist!',
+                    err: err
+                })
+            })
     }
 }
 

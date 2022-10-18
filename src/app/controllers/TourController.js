@@ -22,13 +22,12 @@ const TourController = {
             price: req.body.price,
             sale: req.body.sale,
             area_slug: req.body.area_slug,
-            thumb: req.images.filename,
             images_id: req.photos._id,
             time_start: req.body.time_start,
             time_end: req.body.time_end,
             address_start: req.body.address_start,
             address_end: req.body.address_end,
-            details: req.body.details,
+            schedule: [],
             slug: slug(req.body.title) + '-' + Date.now()
         })
 
@@ -42,7 +41,7 @@ const TourController = {
                 })
             })
             .catch(err => {
-                return res.status(404).json({
+                return res.status(500).json({
                     code: 0,
                     status: false,
                     msg: 'You insert tour faild!',
@@ -51,34 +50,62 @@ const TourController = {
             })
     },
 
+    // update schedule
+    schedule(req, res) {
+        Tour.findByIdAndUpdate(req.body.id, {
+            "$push": {
+                schedule: {
+                    title: req.body.title,
+                    date: req.body.date,
+                    details: req.body.details,
+                }
+            }
+        })
+            .then(tour => {
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You update schedule tour success!',
+                    date: tour
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'You update schedule tour faild!',
+                    err: err
+                })
+            })
+    },
+
     // [GET] /tour/show/all
     all(req, res) {
+        console.log(req.limit, req.skip);
         Tour.aggregate([
             {
                 $lookup: {
-                    from: 'photos',
+                    from: 'photosminis',
                     localField: 'images_id',
                     foreignField: '_id',
                     as: 'images',
                 }
             },
-        ])
+        ])//.limit(req.limit).skip(req.skip)
             .then(result => {
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You get all tour success!',
-                    err: null,
-                    data: result,
+                    data: TourController.convertApiSimple(req, result)
                 })
             })
             .catch(err => {
-                return res.status(404).json({
+                return res.status(500).json({
                     code: 0,
                     status: false,
-                    msg: 'You need something to go on!',
+                    msg: 'You get all tour faild!',
                     err: err,
-                    data: [],
                 })
             })
     },
@@ -86,11 +113,10 @@ const TourController = {
     // [GET] /tour/show/last-tour/:distance | 5
     lastTour(req, res) {
         const day = Func.BetweenTwoDays.nextDays(Date.now(), req.distance)
-
         Tour.aggregate([
             {
                 $lookup: {
-                    from: 'photos',
+                    from: 'photosminis',
                     localField: 'images_id',
                     foreignField: '_id',
                     as: 'images',
@@ -104,19 +130,19 @@ const TourController = {
                 }
             }
         ])
-            .then(tour => {
+            .then(result => {
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You get last tour near now success!',
-                    data: tour
+                    data: TourController.convertApiSimple(req, result)
                 })
             })
             .catch(err => {
                 return res.status(500).json({
                     code: 0,
                     status: false,
-                    msg: 'You need something to go on!',
+                    msg: 'You get last tour near now faild!',
                     err: err
                 })
             })
@@ -127,7 +153,7 @@ const TourController = {
         Tour.aggregate([
             {
                 $lookup: {
-                    from: 'photos',
+                    from: 'photosminis',
                     localField: 'images_id',
                     foreignField: '_id',
                     as: 'images',
@@ -144,7 +170,7 @@ const TourController = {
                     code: 0,
                     status: true,
                     msg: 'You get details tour success!',
-                    data: result
+                    data: TourController.convertApiSimpleDetails(req, result)
                 })
             })
             .catch(err => {
@@ -159,11 +185,10 @@ const TourController = {
 
     // [GEt] /tour/show/all/area/:slug
     forArea(req, res) {
-
         Tour.aggregate([
             {
                 $lookup: {
-                    from: 'photos',
+                    from: 'photosminis',
                     localField: 'images_id',
                     foreignField: '_id',
                     as: 'images',
@@ -179,15 +204,15 @@ const TourController = {
                 return res.status(200).json({
                     code: 0,
                     status: true,
-                    msg: 'You get details tour success!',
-                    data: result
+                    msg: 'You get tour for area success!',
+                    data: TourController.convertApiSimple(req, result)
                 })
             })
             .catch(err => {
                 return res.status(500).json({
                     code: 0,
                     status: true,
-                    msg: 'You get details tour faild!',
+                    msg: 'You get tour for area faild!',
                     err: err
                 })
             })
@@ -203,7 +228,7 @@ const TourController = {
             }
         }, {
             $lookup: {
-                from: 'photos',
+                from: 'photosminis',
                 localField: 'images_id',
                 foreignField: '_id',
                 as: 'images',
@@ -215,7 +240,7 @@ const TourController = {
                     code: 0,
                     status: true,
                     msg: 'You search tour success!',
-                    data: result
+                    data: TourController.convertApiSimple(req, result)
                 })
             })
             .catch(err => {
@@ -226,7 +251,50 @@ const TourController = {
                     err: err
                 })
             })
-    }
+    },
+
+    // func convert mongodb to api simple
+    convertApiSimple(req, result) {
+        const url = req.protocol + '://' + req.get('host')
+        var newResult = []
+        result.map(e => {
+            const { images, thumb, images_id, schedule, rating_id, follow_id, __v, ...others } = e
+            var newImages = []
+            var newThumb = ''
+            images[0].data.map(e => {
+                newImages.push(url + '/api/v1/views/show/photos/' + e.title)
+                return
+            })
+            newThumb = newImages[0]
+            newResult.push({
+                ...others,
+                thumb: newThumb,
+            })
+        })
+        return newResult
+    },
+
+    // func convert mongodb to api simple details
+    convertApiSimpleDetails(req, result) {
+        const url = req.protocol + '://' + req.get('host')
+        var newResult = []
+        result.map(e => {
+            const { images, thumb, images_id, schedule, rating_id, follow_id, __v, ...others } = e
+            var newImages = []
+            var newThumb = ''
+            images[0].data.map(e => {
+                newImages.push(url + '/api/v1/views/show/photos/' + e.title)
+            })
+            newThumb = newImages[0]
+            newResult.push({
+                ...others,
+                thumb: newThumb,
+                images: newImages,
+                schedule: schedule,
+            })
+        })
+        return newResult
+    },
 }
 
 module.exports = TourController

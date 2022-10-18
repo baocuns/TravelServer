@@ -1,4 +1,4 @@
-
+const axios = require('axios').default;
 
 const Tour = {
     store(req, res, next) {
@@ -11,11 +11,11 @@ const Tour = {
         const time_end = req.body.time_end
         const address_start = req.body.address_start
         const address_end = req.body.address_end
-        const details = req.body.details
+        const schedule = req.body.schedule
 
 
         if (!title || !description || !price || !sale || !area_slug || !time_start
-            || !time_end || !address_start || !address_end || !details) {
+            || !time_end || !address_start || !address_end || !schedule) {
             return res.status(404).json({
                 code: 0,
                 status: false,
@@ -40,7 +40,7 @@ const Tour = {
             time_end,
             address_start,
             address_end,
-            details,
+            schedule,
         }
         next()
     },
@@ -94,8 +94,44 @@ const Tour = {
             })
         }
 
-        // req.keyword = '\"' + keyword + '\"'
-        req.keyword = keyword
+        req.keyword = '\"' + keyword + '\"'
+        // req.keyword = keyword
+        next()
+    },
+    crawl(req, res, next) {
+        axios.get('https://travel.com.vn/tourNDSGN166-006-251022VU-H/mua-hoa-tam-giac-mach-ha-giang-lung-cu-dong-van-ma-pi-leng.aspx')
+        .then(result => {
+            return res.json({
+                result
+            })
+        })
+        .catch(err => {
+            return res.json({
+                err
+            })
+        })
+    },
+    limitskip(req, res, next) {
+        const limit = req.params.limit
+        const skip = req.params.skip
+
+        if (!limit || !skip) {
+            return res.status(404).json({
+                code: 0,
+                status: false,
+                msg: 'value is not exist!',
+            })
+        }
+        if (isNaN(limit) || isNaN(skip)) {
+            return res.status(404).json({
+                code: 0,
+                status: false,
+                msg: 'value is not char!',
+            })
+        }
+
+        req.limit = limit
+        req.skip = skip
         next()
     },
 }

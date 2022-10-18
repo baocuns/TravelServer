@@ -57,10 +57,11 @@ const Tour = new mongoose.Schema({
         type: String,
         require: true,
     },
-    details: {
-        type: String,
-        require: true,
-    },
+    schedule: [{
+        title: String,
+        date: Date,
+        details: String,
+    }],
     slug: {
         type: String,
         default: ''
