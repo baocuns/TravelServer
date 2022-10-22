@@ -92,7 +92,7 @@ const Auth = {
         if (!refreshToken) return res.status(401).json({ auth: 'admin', msg: 'You not athenticated!' })
 
         // check refreshToken
-        if (TokenController.find(refreshToken)) {
+        if (!TokenController.find(refreshToken)) {
             return res.status(403).json({ auth: 'admin', msg: 'Refresh TokenController in not valid' })
         }
 
