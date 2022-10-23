@@ -20,9 +20,9 @@ const User = new mongoose.Schema({
         required: true,
         minlength: 6
     },
-    admin: {
-        type: Boolean,
-        default: false
+    permissions: {
+        type: String,
+        default: 'User',
     }
 }, {
     timestamps: true

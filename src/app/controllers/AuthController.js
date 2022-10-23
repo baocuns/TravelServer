@@ -8,16 +8,16 @@ const Auth = {
     generateAccessToken(user) {
         return jwt.sign({
             id: user.id,
-            admin: user.admin
+            permissions: user.permissions,
         },
             process.env.JWT_ACCESS_KEY, {
-            expiresIn: "1d"
+            expiresIn: "1h"
         })
     },
     generateRefreshToken(user) {
         return jwt.sign({
             id: user.id,
-            admin: user.admin
+            permissions: user.permissions,
         },
             process.env.JWT_REFRESH_KEY, {
             expiresIn: "365d"
@@ -35,12 +35,29 @@ const Auth = {
         })
 
         user.save()
-            .then(user => res.status(200).json(user))
-            .catch(err => res.status(500).json(err))
+            .then(user => {
+                const { password, _id, __v, createdAt, updatedAt, ...others } = user._doc;
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'Register success!',
+                    data: {
+                        ...others,
+                    }
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: true,
+                    msg: 'Register faild!',
+                    err: err
+                })
+            })
     },
 
     // [POST] ~/auth/login
-    login(req, res, next) {
+    login(req, res) {
         // clear token old
         res.clearCookie('refreshToken')
         const oldToken = req.cookies.refreshToken
@@ -51,11 +68,23 @@ const Auth = {
             username: req.body.username,
         })
             .then(async user => {
-                !user && res.status(404).json({ auth: 'admin', msg: 'user invalid !' })
+                if (!user) {
+                    return res.status(404).json({
+                        code: 0,
+                        status: false,
+                        msg: 'Username is no valid!'
+                    })
+                }
 
                 const validPassword = await bcrypt.compare(req.body.password, user.password)
 
-                !validPassword && res.status(404).json({ auth: 'admin', msg: 'password invalid !' })
+                if (!validPassword) {
+                    return res.status(404).json({
+                        code: 0,
+                        status: false,
+                        msg: 'Password is no valid!'
+                    })
+                }
 
                 if (user && validPassword) {
                     const accessToken = Auth.generateAccessToken(user)
@@ -72,33 +101,69 @@ const Auth = {
                         sameSite: 'strict',
                     })
 
-
-                    const { password, ...others } = user._doc;
-                    res.status(200).json({ ...others, accessToken })
+                    const { password, _id, __v, createdAt, updatedAt, ...others } = user._doc;
+                    return res.status(200).json({
+                        code: 0,
+                        status: true,
+                        msg: 'Login success!',
+                        data: {
+                            ...others,
+                            accessToken,
+                        }
+                    })
                 }
             })
-            .catch(next)
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'Login faild!',
+                    err: err
+                })
+            })
     },
     // [POST] ~/auth/logout
-    logout(req, res, next) {
-        res.clearCookie('refreshToken')
-        TokenController.delete(req.cookies.refreshToken)
-        // refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken)
-        res.status(200).json({ auth: 'admin', msg: 'Logoout successfully!' })
+    logout(req, res) {
+        try {
+            res.clearCookie('refreshToken')
+            TokenController.delete(req.cookies.refreshToken)
+            // refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken)
+            return res.status(200).json({
+                code: 0,
+                status: true,
+                msg: 'Logout success!'
+            })
+        } catch (error) {
+            return res.status(500).json({
+                code: 0,
+                status: false,
+                msg: 'Logout faild!',
+                err: error
+            })
+        }
+
     },
     // [POST] ~/auth/refresh
     refresh(req, res) {
         const refreshToken = req.cookies.refreshToken
-        if (!refreshToken) return res.status(401).json({ auth: 'admin', msg: 'You not athenticated!' })
+        if (!refreshToken) return res.status(404).json({
+            code: 0,
+            status: false,
+            msg: 'You not athenticated!'
+        })
 
         // check refreshToken
         if (!TokenController.find(refreshToken)) {
-            return res.status(403).json({ auth: 'admin', msg: 'Refresh TokenController in not valid' })
+            return res.status(403).json({
+                code: 0,
+                status: false,
+                msg: 'Refresh TokenController in not valid!'
+            })
         }
 
         // verify refreshToken
         jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
-            
+
             // delete token old
             TokenController.delete(refreshToken)
             // refreshTokens = refreshTokens.filter(token => token !== refreshToken)
@@ -116,7 +181,14 @@ const Auth = {
                 path: '/',
                 sameSite: 'strict',
             })
-            res.status(200).json({ accessToken: newAccessToken })
+            return res.status(200).json({
+                code: 0,
+                status: false,
+                msg: 'Refresh TokenController success!',
+                data: {
+                    accessToken: newAccessToken
+                }
+            })
         })
     },
 
@@ -125,8 +197,22 @@ const Auth = {
     // [GET] ~/auth/user/show/all
     all(req, res, next) {
         User.find()
-            .then(user => res.status(200).json(user))
-            .catch(next)
+            .then(users => {
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You get all user success!',
+                    data: users
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'You get all user faild!',
+                    err: err
+                })
+            })
     },
     // [GET] ~/auth/user/show/all
     details(req, res) {
@@ -135,10 +221,22 @@ const Auth = {
         })
             .then(user => {
                 const { password, ...others } = user._doc;
-                res.status(200).json({ ...others })
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You get details user success!',
+                    data: {
+                        ...others
+                    }
+                })
             })
             .catch(err => {
-                res.status(404).json({ auth: 'admin', msg: 'You do not have permission to perform this operation!', err })
+                return res.status(404).json({
+                    code: 0,
+                    status: false,
+                    msg: 'You do not have permission to perform this operation!',
+                    err: err
+                })
             })
     },
 

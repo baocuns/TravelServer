@@ -8,7 +8,7 @@ router.get('/user/show/all', middlewareAuth.verifyAdminAuth, Auth.all)
 router.post('/user/show/details/:username', middlewareAuth.verifyTokenAndAdminAuth, Auth.details)
 
 // auth
-router.post('/register', Auth.register)
+router.post('/register', middlewareAuth.verifyEmailValid, Auth.register)
 router.post('/login', Auth.login)
 router.post('/logout', middlewareAuth.verifyToken, Auth.logout)
 router.post('/refresh', Auth.refresh)
