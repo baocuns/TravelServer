@@ -13,6 +13,10 @@ const Area = new mongoose.Schema({
         type: String,
         required: true,
     },
+    image: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Photos'
+    },
     slug: {
         type: String,
         required: true,

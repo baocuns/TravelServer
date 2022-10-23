@@ -12,17 +12,26 @@ const AreaController = {
 
     // [GET] /show/all
     all(req, res) {
-        Area.find()
-            .then(area => {
+        Area.aggregate([
+            {
+                $lookup: {
+                    from: 'photosminis',
+                    localField: 'image',
+                    foreignField: '_id',
+                    as: 'images',
+                }
+            },
+        ])
+            .then(result => {
                 res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'Get all area successfully!',
-                    data: area
+                    data: AreaController.convertApiSimple(req, result)
                 })
             })
             .catch(err => {
-                res.status(404).json({
+                res.status(500).json({
                     code: 0,
                     status: false,
                     msg: 'Get all area failed!',
@@ -45,11 +54,10 @@ const AreaController = {
                         data: area
                     })
                 }
-
                 res.status(200).json({
                     code: 0,
                     status: true,
-                    msg: 'Get details area successfully!',
+                    msg: 'Get details area success!',
                     data: area
                 })
             })
@@ -77,11 +85,10 @@ const AreaController = {
                         data: area
                     })
                 }
-
                 res.status(200).json({
                     code: 0,
                     status: true,
-                    msg: 'Get all area type region successfully!',
+                    msg: 'Get all area type region success!',
                     data: area
                 })
             })
@@ -191,7 +198,28 @@ const AreaController = {
                     err: err
                 })
             })
-    }
+    },
+
+    // func convert mongodb to api simple
+    convertApiSimple(req, result) {
+        const url = req.protocol + '://' + req.get('host')
+        var newResult = []
+        result.map(e => {
+            const { images, image, __v, ...others } = e
+            var newImages = []
+            var newThumb = ''
+            images[0].data.map(e => {
+                newImages.push(url + '/api/v1/views/show/photos/' + e.title)
+                return
+            })
+            newThumb = newImages[0]
+            newResult.push({
+                ...others,
+                thumb: newThumb,
+            })
+        })
+        return newResult
+    },
 }
 
 module.exports = AreaController
