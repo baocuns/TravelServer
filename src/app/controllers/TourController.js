@@ -22,6 +22,7 @@ const TourController = {
             price: req.body.price,
             sale: req.body.sale,
             area_slug: req.body.area_slug,
+            rating_id: req.rating._id,
             images_id: req.photos._id,
             time_start: req.body.time_start,
             time_end: req.body.time_end,
@@ -248,6 +249,31 @@ const TourController = {
                     code: 0,
                     status: false,
                     msg: 'You search tour faild!',
+                    err: err
+                })
+            })
+    },
+
+    // update id rating to tour 
+    //[POST] ~/rating/store
+    updateIdRating(req, res) {
+        const id = req.body.parentId
+        const ratingId = req.rating._id
+        Tour.findByIdAndUpdate(id, {
+            rating_id: ratingId
+        })
+            .then(result => {
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You rating success!',
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You rating faild!',
                     err: err
                 })
             })

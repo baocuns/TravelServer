@@ -3,17 +3,19 @@ const multer = require("multer");
 
 const Upload = {
     upload(req, res, next) {
-        // SET STORAGE
-        const storage = multer.diskStorage({
-            destination: function (req, file, cb) {
-                cb(null, 'src/public/uploads')
-            },
-            filename: function (req, file, cb) {
-                cb(null, file.fieldname + '-' + Date.now() + '.' + file.mimetype.split('/')[1])
+        const upload = multer().array('photos')
+
+        upload(req, res, async function (err) {
+            if (err instanceof multer.MulterError) {
+                // A Multer error occurred when uploading.
+                return false
+            } else if (err) {
+                // An unknown error occurred when uploading.
+                return false
             }
+            // Everything went fine. save to database
+            next()
         })
-        req.storage = storage
-        next()
     },
     storage() {
         // SET STORAGE

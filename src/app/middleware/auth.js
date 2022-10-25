@@ -39,15 +39,18 @@ const auth = {
     },
 
     // verify token admin and current user
-    verifyTokenAndAdminAuth(req, res, next) {
+    verifyTokenUserAndAdminAuth(req, res, next) {
+        const username = req.params.username
+        const role = 'Admin'
+        const uid = req.body.user_id
         auth.verifyToken(req, res, () => {
-            if (req.user.username === req.params.username || req.user.permissions === 'Admin') {
+            if (req.user.username === username || req.user.permissions === role || req.user._id === uid) {
                 next()
             } else {
                 return res.status(403).json({
                     code: 0,
                     status: false,
-                    msg: 'You do not have permission to perform this operation!'
+                    msg: 'You do not have permission to perform this operation!',
                 })
             }
         })

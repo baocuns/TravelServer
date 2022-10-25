@@ -101,7 +101,7 @@ const Auth = {
                         sameSite: 'strict',
                     })
 
-                    const { password, _id, __v, createdAt, updatedAt, ...others } = user._doc;
+                    const { password, __v, createdAt, updatedAt, ...others } = user._doc;
                     return res.status(200).json({
                         code: 0,
                         status: true,
