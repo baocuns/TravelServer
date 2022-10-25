@@ -16,12 +16,14 @@ const ProfileMiddleware = {
             user_id: user_id
         })
             .then(result => {
-                !result && next()
-                return res.status(501).json({
-                    code: 0,
-                    status: false,
-                    msg: 'Profile information already exists!',
-                })
+                if(result) {
+                    return res.status(501).json({
+                        code: 0,
+                        status: false,
+                        msg: 'Profile information already exists!',
+                    })
+                }
+                next()
             })
             .catch(err => {
                 return res.status(500).json({
