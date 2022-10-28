@@ -6,6 +6,11 @@ const Profile = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     fullname: {
         type: String,
         required: true,

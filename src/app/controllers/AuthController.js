@@ -8,6 +8,7 @@ const Auth = {
     generateAccessToken(user) {
         return jwt.sign({
             id: user.id,
+            username: user.username,
             permissions: user.permissions,
         },
             process.env.JWT_ACCESS_KEY, {

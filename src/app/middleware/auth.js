@@ -44,7 +44,7 @@ const auth = {
         const role = 'Admin'
         const uid = req.body.user_id
         auth.verifyToken(req, res, () => {
-            if (req.user.username === username || req.user.permissions === role || req.user._id === uid) {
+            if (req.user.username === username || req.user.permissions === role || req.user.id === uid) {
                 next()
             } else {
                 return res.status(403).json({

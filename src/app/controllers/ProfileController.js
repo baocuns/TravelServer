@@ -1,5 +1,7 @@
 
 const Profile = require('../models/Profile')
+const PhotosMini = require('../models/PhotosMini')
+const Func = require('../../func')
 
 const ProfileController = {
     // [GET] ~/profile
@@ -14,8 +16,10 @@ const ProfileController = {
     // [POST] ~/store
     store(req, res) {
         const { user_id, fullname, email, phone, birthday, sex, country, address } = req.body
+        const { id, username } = req.user
         const profile = new Profile({
-            user_id: user_id,
+            user_id: id,
+            username: username,
             fullname: fullname,
             email: email,
             phone: phone,
@@ -40,6 +44,82 @@ const ProfileController = {
                     code: 0,
                     status: false,
                     msg: 'You update profile faild!',
+                })
+            })
+    },
+
+    // [POST] ~/show/details/:username
+    details(req, res) {
+        const { username } = req.params
+
+        Profile.aggregate([
+            {
+                $lookup: {
+                    from: 'photosminis',
+                    localField: 'image',
+                    foreignField: '_id',
+                    as: 'images',
+                }
+            },
+            {
+                $match: {
+                    username: username
+                }
+            }
+        ])
+            .then(result => {
+                Func.SimpleArrayPhotos(req, result)
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You show all profile success!',
+                    data: result
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You show all profile faild!',
+                    err: err
+                })
+            })
+    },
+
+    // [POST] ~/show/all/:limit/:skip
+    all(req, res) {
+        const { limit, skip } = req.params
+        Profile.aggregate([
+            {
+                $lookup: {
+                    from: 'photosminis',
+                    localField: 'image',
+                    foreignField: '_id',
+                    as: 'images',
+                }
+            },
+            {
+                $limit: parseInt(limit)
+            },
+            {
+                $skip: parseInt(skip)
+            }
+        ])
+            .then(result => {
+                Func.SimpleArrayPhotos(req, result)
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You show all profile success!',
+                    data: result
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You show all profile faild!',
+                    err: err
                 })
             })
     }

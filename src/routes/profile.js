@@ -6,7 +6,9 @@ const middlewareAuth = require('../app/middleware/auth')
 const { Photo } = require('../app/controllers/UploadController')
 const router = express.Router()
 
-router.post('/store', middlewareAuth.verifyTokenUserAndAdminAuth, UploadMiddleware.upload, ProfileMiddleware.store, Photo.storePhotos, ProfileController.store)
+router.post('/store', UploadMiddleware.upload, middlewareAuth.verifyTokenUserAndAdminAuth, ProfileMiddleware.store, Photo.storePhotos, ProfileController.store)
+router.post('/show/all/:limit/:skip', middlewareAuth.verifyAdminAuth, ProfileController.all)
+router.post('/show/details/:username', middlewareAuth.verifyTokenUserAndAdminAuth, ProfileController.details)
 
 router.use('/', ProfileController.index)
 
