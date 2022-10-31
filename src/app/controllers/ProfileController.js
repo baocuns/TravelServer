@@ -40,7 +40,7 @@ const ProfileController = {
                 })
             })
             .catch(err => {
-                return res.status(200).json({
+                return res.status(500).json({
                     code: 0,
                     status: false,
                     msg: 'You update profile faild!',
@@ -72,7 +72,7 @@ const ProfileController = {
                 return res.status(200).json({
                     code: 0,
                     status: true,
-                    msg: 'You show all profile success!',
+                    msg: 'You show profile success!',
                     data: result
                 })
             })
@@ -80,7 +80,7 @@ const ProfileController = {
                 return res.status(500).json({
                     code: 0,
                     status: true,
-                    msg: 'You show all profile faild!',
+                    msg: 'You show profile faild!',
                     err: err
                 })
             })
@@ -120,6 +120,39 @@ const ProfileController = {
                     status: true,
                     msg: 'You show all profile faild!',
                     err: err
+                })
+            })
+    },
+
+    // [PUT] ~/update
+    update(req, res) {
+        const { user_id, fullname, email, phone, birthday, sex, country, address } = req.body
+        const { id, username } = req.user
+
+        console.log(user_id, fullname, email, phone, birthday, sex, country, address);
+        Profile.findOneAndUpdate({
+            user_id: user_id
+        }, {
+            fullname: fullname,
+            email: email,
+            phone: phone,
+            birthday: birthday,
+            sex: sex,
+            country: country,
+            address: address,
+        })
+            .then(result => {
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You update profile success!',
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'You update profile faild!',
                 })
             })
     }

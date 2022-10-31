@@ -23,6 +23,10 @@ const User = new mongoose.Schema({
     permissions: {
         type: String,
         default: 'User',
+    },
+    verify: {
+        type: Boolean,
+        default: false,
     }
 }, {
     timestamps: true

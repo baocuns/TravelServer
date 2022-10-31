@@ -42,7 +42,7 @@ const Profile = new mongoose.Schema({
     image: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-    }
+    },
 }, {
     timestamps: true
 })
