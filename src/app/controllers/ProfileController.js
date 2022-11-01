@@ -126,19 +126,17 @@ const ProfileController = {
 
     // [PUT] ~/update
     update(req, res) {
-        const { user_id, fullname, email, phone, birthday, sex, country, address } = req.body
+        const {fullname, phone, birthday, sex, country, address } = req.body
         const { id, username } = req.user
 
-        console.log(user_id, fullname, email, phone, birthday, sex, country, address);
         Profile.findOneAndUpdate({
-            user_id: user_id
+            user_id: id
         }, {
             fullname: fullname,
-            email: email,
             phone: phone,
             birthday: birthday,
             sex: sex,
-            country: country,
+            country: country,   
             address: address,
         })
             .then(result => {

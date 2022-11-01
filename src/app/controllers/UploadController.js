@@ -3,6 +3,7 @@ const Photos = require('../models/Photos')
 const PhotosMini = require('../models/PhotosMini')
 const path = require('path');
 const multer = require("multer");
+const Profile = require('../models/Profile')
 
 const Photo = {
     // [POST] /upload
@@ -83,9 +84,46 @@ const Photo = {
 
     // delete photo
     delete(req, res) {
-        Photos.findOneAndDelete({
-            title: 'photos-16666192146870'
+        const { title } = req.body
+        Photos.findOneAndDelete({ title: title })
+            .then(result => {
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You have successfully deleted the photo!',
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'You have failed to delete the photo!',
+                })
+            })
+    },
+
+    // update
+    update(req, res, next) {
+        req.files.map(e => {
+            Photos.findOneAndUpdate({ title: req.photos }, {
+                img: e.buffer
+            })
+                .then(() => {
+                    return res.status(200).json({
+                        code: 0,
+                        status: true,
+                        msg: 'You have successfully updated the photo!'
+                    })
+                })
+                .catch(err => {
+                    return res.status(500).json({
+                        code: 0,
+                        status: false,
+                        msg: 'You have failed to updated the photo!',
+                    })
+                })
         })
+
     }
 }
 

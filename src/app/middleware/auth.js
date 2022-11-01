@@ -41,8 +41,9 @@ const auth = {
         const username = req.params.username
         const role = 'Admin'
         const uid = req.body.user_id
+        const _id = req.headers.user_id
         auth.verifyToken(req, res, () => {
-            if (req.user.username === username || req.user.permissions === role || req.user.id === uid) {
+            if (req.user.username === username || req.user.permissions === role || req.user.id === uid || req.user.id === _id) {
                 next()
             } else {
                 return res.status(403).json({
@@ -54,7 +55,7 @@ const auth = {
         })
     },
 
-    // verify admin
+    // verify permission admin
     verifyAdminAuth(req, res, next) {
         auth.verifyToken(req, res, () => {
             if (req.user.permissions === 'Admin') {
@@ -69,7 +70,7 @@ const auth = {
         })
     },
 
-    // verify super
+    // verify permission super
     verifySuperAuth(req, res, next) {
         auth.verifyToken(req, res, () => {
             if (req.user.permissions === 'Super') {
@@ -84,10 +85,13 @@ const auth = {
         })
     },
 
-    // verify super
+    // verify permission user
     verifyUserAuth(req, res, next) {
+        const username = req.params.username
+        const uid = req.body.user_id
+        const _id = req.headers.user_id
         auth.verifyToken(req, res, () => {
-            if (req.user.permissions === 'User') {
+            if (req.user.username === username || req.user.id === uid || req.user.id === _id) {
                 next()
             } else {
                 return res.status(403).json({

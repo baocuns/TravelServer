@@ -1,4 +1,5 @@
-
+const Profile = require('../models/Profile')
+const PhotosMini = require('../models/PhotosMini')
 const multer = require("multer");
 
 const Upload = {
@@ -28,6 +29,34 @@ const Upload = {
             }
         })
         return storage
+    },
+    updatePhotosProfile(req, res, next) {
+        Profile.findOne({
+            user_id: req.user.id
+        })
+            .then(result => {
+                PhotosMini.findById(result.image)
+                    .then(photos => {
+                        const { title } = photos.data[0]
+                        req.photos = title
+                        next()
+                    })
+                    .catch(err => {
+                        return res.status(500).json({
+                            code: 0,
+                            status: false,
+                            msg: 'You have failed to updated the photo!',
+                        })
+                    })
+
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'You have failed to updated the photo!',
+                })
+            })
     }
 }
 

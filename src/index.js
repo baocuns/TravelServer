@@ -1,33 +1,36 @@
 const path = require('path')
 const express = require('express')
+
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+
 const app = express()
-const port = 80
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 const route = require('./routes')
+const db = require('./database/config/config')
+const socketio = require('./socketio')
+
+const port = 80
 
 app.use(cookieParser())
-
 app.use(express.static(path.join(__dirname, 'public')))
-const db = require('./database/config/config')
 
 //connect db
 db.connect()
+socketio.connect(io)
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-// app.use(express.urlencoded({
-//   extended: true
-// }))
-// app.use(express.json())
-
 
 // route
 route(app)
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`)
 })
 
