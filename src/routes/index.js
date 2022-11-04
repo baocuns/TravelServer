@@ -10,8 +10,10 @@ const upload = require('./upload')
 const views = require('./views')
 const profile = require('./profile')
 const verify = require('./verify')
+const service = require('./service')
 
 function route(app) {
+    app.use('/api/v1/service', service)
     app.use('/api/v1/verify', verify)
     app.use('/api/v1/profile', profile)
     app.use('/api/v1/views', views)

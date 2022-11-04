@@ -14,7 +14,7 @@ const TourController = {
     },
 
     // [POST] /tour/store
-    store(req, res) {
+    store(req, res, next) {
         // upload photos
         const tour = new Tour({
             title: req.body.title,
@@ -34,18 +34,14 @@ const TourController = {
 
         tour.save()
             .then(tour => {
-                return res.status(200).json({
-                    code: 0,
-                    status: true,
-                    msg: 'You insert tour success!',
-                    date: tour
-                })
+                req.tour_id = tour._id
+                next()
             })
             .catch(err => {
                 return res.status(500).json({
                     code: 0,
                     status: false,
-                    msg: 'You insert tour faild!',
+                    msg: 'You have added the service to the system failed!',
                     err: err
                 })
             })

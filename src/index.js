@@ -1,5 +1,6 @@
 const path = require('path')
 const express = require('express')
+const cors = require('cors')
 
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
@@ -16,6 +17,7 @@ const socketio = require('./socketio')
 
 const port = 80
 
+app.use(cors())
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
