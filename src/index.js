@@ -19,7 +19,7 @@ const port = 80
 
 app.use(cors({
   credentials: true,
-  origin: '*',
+  origin: 'https://scintillating-pika-b6ff28.netlify.app',
 }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
