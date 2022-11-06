@@ -15,6 +15,8 @@ router.get('/show/all/search/:keyword', TourMiddleware.keyword, TourController.s
 router.get('/show/all/:limit/:skip', TourMiddleware.limitskip, TourController.all)
 router.get('/show/all/crawl', TourMiddleware.crawl)
 
+router.delete('/delete', UploadMiddleware.upload, TourController.delete)
+
 router.use('/', TourController.index)
 
 module.exports = router

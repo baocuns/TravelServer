@@ -40,7 +40,7 @@ const Tour = {
             time_end,
             address_start,
             address_end,
-            schedule,
+            schedule: JSON.parse(schedule),
         }
         next()
     },
@@ -100,16 +100,16 @@ const Tour = {
     },
     crawl(req, res, next) {
         axios.get('https://travel.com.vn/tourNDSGN166-006-251022VU-H/mua-hoa-tam-giac-mach-ha-giang-lung-cu-dong-van-ma-pi-leng.aspx')
-        .then(result => {
-            return res.json({
-                result
+            .then(result => {
+                return res.json({
+                    result
+                })
             })
-        })
-        .catch(err => {
-            return res.json({
-                err
+            .catch(err => {
+                return res.json({
+                    err
+                })
             })
-        })
     },
     limitskip(req, res, next) {
         const limit = req.params.limit

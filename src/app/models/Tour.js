@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
 const Tour = new mongoose.Schema({
+    username: {
+        type: String,
+        require: true,
+    },
     title: {
         type: String,
         require: true,

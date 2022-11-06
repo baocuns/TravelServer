@@ -8,9 +8,10 @@ const RatingController = require('../app/controllers/RatingController')
 const TourController = require('../app/controllers/TourController')
 const router = express.Router()
 
-router.put('/store', UploadMiddleware.upload, middlewareAuth.verifyUserAuth, middlewareAuth.verifySuperAuth, TourMiddleware.store, 
-Photo.storePhotos, RatingController.store, TourController.store, ServiceController.store)
+router.put('/store', UploadMiddleware.upload, middlewareAuth.verifyUserAuth, middlewareAuth.verifySuperAuth, TourMiddleware.store,
+    Photo.storePhotos, RatingController.store, TourController.store, ServiceController.store)
+router.get('/:username', TourController.forUsername)
 
 router.use('/', ServiceController.index)
 
-module.exports = router
+module.exports = router 

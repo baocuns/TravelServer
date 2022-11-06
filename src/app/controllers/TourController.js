@@ -2,6 +2,7 @@ const Photos = require('../models/Photos')
 const Tour = require('../models/Tour')
 const slug = require('slug')
 const Func = require('../../func')
+const PhotosMini = require('../models/PhotosMini')
 
 const TourController = {
     // [GET] /tour
@@ -17,19 +18,20 @@ const TourController = {
     store(req, res, next) {
         // upload photos
         const tour = new Tour({
-            title: req.body.title,
-            description: req.body.description,
-            price: req.body.price,
-            sale: req.body.sale,
-            area_slug: req.body.area_slug,
+            username: req.user.username,
+            title: req.tour.title,
+            description: req.tour.description,
+            price: req.tour.price,
+            sale: req.tour.sale,
+            area_slug: req.tour.area_slug,
             rating_id: req.rating._id,
             images_id: req.photos._id,
-            time_start: req.body.time_start,
-            time_end: req.body.time_end,
-            address_start: req.body.address_start,
-            address_end: req.body.address_end,
-            schedule: [],
-            slug: slug(req.body.title) + '-' + Date.now()
+            time_start: req.tour.time_start,
+            time_end: req.tour.time_end,
+            address_start: req.tour.address_start,
+            address_end: req.tour.address_end,
+            schedule: req.tour.schedule,
+            slug: slug(req.tour.title) + '-' + Date.now()
         })
 
         tour.save()
@@ -71,6 +73,42 @@ const TourController = {
                     code: 0,
                     status: false,
                     msg: 'You update schedule tour faild!',
+                    err: err
+                })
+            })
+    },
+
+    // [GET] tour/:username/:limit/:skip
+    forUsername(req, res) {
+        const { username } = req.params
+        Tour.aggregate([
+            {
+                $lookup: {
+                    from: 'photosminis',
+                    localField: 'images_id',
+                    foreignField: '_id',
+                    as: 'images',
+                }
+            },
+            {
+                $match: {
+                    username: username
+                }
+            }
+        ])
+            .then(result => {
+                return res.status(200).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You successfully retrieved tour data.',
+                    data: TourController.convertApiSimple(req, result)
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: true,
+                    msg: 'You have failed to retrieve tour data!',
                     err: err
                 })
             })
@@ -316,6 +354,32 @@ const TourController = {
             })
         })
         return newResult
+    },
+
+    // delete
+    delete(req, res) {
+        Tour.findByIdAndDelete(req.body.id)
+            .then(result => {
+                PhotosMini.findByIdAndDelete(result.images_id)
+                    .then(result => {
+                        const { data } = result
+                        data.map(e => {
+                            Photos.findOneAndDelete({
+                                title: e.title
+                            })
+                                .then(() => {
+                                    console.log('delete photos: ', e.title);
+                                })
+                        })
+                        return res.status(200).json({
+                            code: 0,
+                            status: true,
+                            msg: 'You rating success!',
+                            data: result
+                        })
+                    })
+
+            })
     },
 }
 

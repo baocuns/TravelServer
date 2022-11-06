@@ -12,12 +12,13 @@ const Auth = {
             permissions: user.permissions,
         },
             process.env.JWT_ACCESS_KEY, {
-            expiresIn: "1h"
+            expiresIn: "20s"
         })
     },
     generateRefreshToken(user) {
         return jwt.sign({
             id: user.id,
+            username: user.username,
             permissions: user.permissions,
         },
             process.env.JWT_REFRESH_KEY, {
@@ -125,6 +126,20 @@ const Auth = {
     },
     // [POST] ~/auth/logout
     logout(req, res) {
+        const refreshToken = req.cookies.refreshToken
+        if (!refreshToken) return res.status(404).json({
+            code: 0,
+            status: false,
+            msg: 'You not athenticated, not refreshToken!'
+        })
+        // check refreshToken in db
+        if (!TokenController.find(refreshToken)) {
+            return res.status(403).json({
+                code: 0,
+                status: false,
+                msg: 'Refresh TokenController in not valid!'
+            })
+        }
         try {
             res.clearCookie('refreshToken')
             TokenController.delete(req.cookies.refreshToken)
@@ -185,7 +200,7 @@ const Auth = {
             return res.status(200).json({
                 code: 0,
                 status: false,
-                msg: 'Refresh TokenController success!',
+                msg: 'Refresh Token success!',
                 data: {
                     accessToken: newAccessToken
                 }

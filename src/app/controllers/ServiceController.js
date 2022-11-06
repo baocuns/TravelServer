@@ -3,7 +3,6 @@ const Service = require("../models/Service")
 
 const ServiceController = {
     index(req, res) {
-        console.log(req.body);
         return res.status(200).json({
             code: 0,
             status: true,
@@ -81,6 +80,23 @@ const ServiceController = {
                     err: err
                 })
             })
+    },
+    forUsernme(req, res, next) {
+        const { username } = req.params
+        // Service.findOne({
+        //     username: username
+        // })
+        // .then(result => {
+        //     req.tours = result.services
+        //     next()
+        // })
+        // .catch(err => {
+        //     return res.status(500).json({
+        //         code: 0,
+        //         status: false,
+        //         msg: 'You have failed to retrieve tour data!',
+        //     })
+        // })
     }
 }
 
