@@ -19,7 +19,7 @@ const port = 80
 
 app.use(cors({
   credentials: true,
-  origin: 'https://scintillating-pika-b6ff28.netlify.app',
+  origin: 'http://localhost',
 }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
@@ -31,6 +31,9 @@ socketio.connect(io)
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+
+// Template engine
+app.use(express.static(path.join(__dirname, 'resources/views')));
 
 // route
 route(app)
