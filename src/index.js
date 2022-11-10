@@ -19,7 +19,7 @@ const port = 80
 
 app.use(cors({
   credentials: true,
-  origin: 'https://api.travels.games',
+  origin: 'https://api.travels.games', //https://api.travels.games - http://localhost
 }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))

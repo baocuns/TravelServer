@@ -12,7 +12,7 @@ const Auth = {
             permissions: user.permissions,
         },
             process.env.JWT_ACCESS_KEY, {
-            expiresIn: "20s"
+            expiresIn: "1d"
         })
     },
     generateRefreshToken(user) {
