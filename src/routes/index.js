@@ -12,8 +12,10 @@ const profile = require('./profile')
 const verify = require('./verify')
 const service = require('./service')
 const client = require('./client')
+const posts = require('./posts')
 
 function route(app) {
+    app.use('/api/v1/posts', posts)
     app.use('/api/v1/service', service)
     app.use('/api/v1/verify', verify)
     app.use('/api/v1/profile', profile)
