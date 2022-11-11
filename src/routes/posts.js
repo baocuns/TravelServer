@@ -6,7 +6,7 @@ const Upload = require('../app/middleware/upload')
 const { Photo } = require('../app/controllers/UploadController')
 const router = express.Router()
 
-router.post('/store', Upload.upload, auth.verifyUserAuth, PostsMiddleware.store,  PostsController.store)
+router.post('/store', Upload.upload, auth.verifyUserAuth, PostsMiddleware.store, Photo.storePhotos, PostsController.store)
 router.put('/like/:pid', Upload.upload, auth.verifyUserAuth, PostsController.like)
 
 router.get('/show/new', PostsController.new)

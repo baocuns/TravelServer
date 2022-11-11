@@ -15,7 +15,7 @@ const PostsController = {
     store(req, res) {
         const { id, username } = req.user
         const { address, content } = req.posts
-        const image = mongoose.Types.ObjectId('636e256bc85e99bc2ae7acf4')
+        const image = req.photos._id
 
         const posts = new Posts({
             username: username,
