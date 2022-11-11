@@ -21,7 +21,10 @@ const Posts = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    likes: [String],
+    likes: {
+        type: Array,
+        default: null,
+    },
     comment: {
         type: Number,
         default: 0,

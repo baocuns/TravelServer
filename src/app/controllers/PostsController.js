@@ -15,16 +15,13 @@ const PostsController = {
     store(req, res) {
         const { id, username } = req.user
         const { address, content } = req.posts
-        const image = req.photos._id
-
-        console.log(req.posts, image);
+        const image = mongoose.Types.ObjectId('636e256bc85e99bc2ae7acf4')
 
         const posts = new Posts({
             username: username,
             address: address,
             content: content,
             image: image,
-            likes: [],
         })
 
         posts.save()
@@ -106,7 +103,6 @@ const PostsController = {
         Posts.findById(pid)
             .then(posts => {
                 const isLike = posts.likes.some(e => e === username)
-                console.log(isLike);
                 if (!isLike) {
                     Posts.findByIdAndUpdate(pid, {
                         $inc: {
