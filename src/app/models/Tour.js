@@ -41,9 +41,9 @@ const Tour = new mongoose.Schema({
         type: String,
         default: ''
     },
-    images_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Photos'
+    images: {
+        type: Array,
+        default: null
     },
     time_start: {
         type: Date,
@@ -79,7 +79,6 @@ Tour.index({
     description: 'text',
     area_slug: 'text',
     address_start: 'text',
-    address_end: 'text',
     address_end: 'text',
     details: 'text',
 })

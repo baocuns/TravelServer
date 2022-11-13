@@ -1,5 +1,6 @@
 const Area = require('../models/Area')
 const slug = require('slug')
+const Func = require('../../func')
 
 const AreaController = {
     index(req, res) {
@@ -12,22 +13,14 @@ const AreaController = {
 
     // [GET] /show/all
     all(req, res) {
-        Area.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'image',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-        ])
+        Area.find()
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'Get all area successfully!',
-                    data: AreaController.convertApiSimple(req, result)
+                    data: result
                 })
             })
             .catch(err => {
@@ -45,20 +38,14 @@ const AreaController = {
         Area.findOne({
             slug: req.params.slug
         })
-            .then(area => {
-                if (!area) {
-                    return res.status(404).json({
-                        code: 0,
-                        status: false,
-                        msg: 'Get details area failed!',
-                        data: area
-                    })
-                }
+            .then(result => {
+                result = [result]
+                Func.SimpleArrayPhotos(req, result)
                 res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'Get details area success!',
-                    data: area
+                    data: result
                 })
             })
             .catch(err => {
@@ -76,20 +63,13 @@ const AreaController = {
         Area.find({
             type: req.params.type
         })
-            .then(area => {
-                if (!area.length) {
-                    return res.status(404).json({
-                        code: 0,
-                        status: false,
-                        msg: 'type region invalid!',
-                        data: area
-                    })
-                }
+            .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'Get all area type region success!',
-                    data: area
+                    data: result
                 })
             })
             .catch(err => {
@@ -103,13 +83,14 @@ const AreaController = {
     },
 
     // [POST] /store
-    async store(req, res) {
+    store(req, res) {
 
         const area = new Area({
             title: req.body.title,
             region: req.body.region,
             type: slug(req.body.region),
-            slug: slug(req.body.title)
+            slug: slug(req.body.title),
+            images: req.keys
         })
 
         area.save()
@@ -199,27 +180,10 @@ const AreaController = {
                 })
             })
     },
-
-    // func convert mongodb to api simple
-    convertApiSimple(req, result) {
-        const url = req.protocol + '://' + req.get('host')
-        var newResult = []
-        result.map(e => {
-            const { images, image, __v, ...others } = e
-            var newImages = []
-            var newThumb = ''
-            images[0].data.map(e => {
-                newImages.push(url + '/api/v1/views/show/photos/' + e.title)
-                return
-            })
-            newThumb = newImages[0]
-            newResult.push({
-                ...others,
-                thumb: newThumb,
-            })
-        })
-        return newResult
-    },
 }
 
 module.exports = AreaController
+
+// updateMany({}, {
+//     $unset: { image: 1 }
+// }, { multi: true })

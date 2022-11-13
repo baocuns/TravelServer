@@ -3,10 +3,10 @@ const PostsController = require('../app/controllers/PostsController')
 const PostsMiddleware = require('../app/middleware/posts')
 const auth = require('../app/middleware/auth')
 const Upload = require('../app/middleware/upload')
-const { Photo } = require('../app/controllers/UploadController')
+const PhotosController = require('../app/controllers/PhotosController')
 const router = express.Router()
 
-router.post('/store', Upload.upload, auth.verifyUserAuth, PostsMiddleware.store, Photo.storePhotos, PostsController.store)
+router.post('/store', Upload.upload, auth.verifyUserAuth, PostsMiddleware.store, PhotosController.store, PostsController.store)
 router.put('/like/:pid', Upload.upload, auth.verifyUserAuth, PostsController.like)
 
 router.get('/show/new', PostsController.new)

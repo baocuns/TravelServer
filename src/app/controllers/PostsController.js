@@ -15,17 +15,17 @@ const PostsController = {
     store(req, res) {
         const { id, username } = req.user
         const { address, content } = req.posts
-        const image = req.photos._id
+        const images = req.keys
 
         const posts = new Posts({
             username: username,
             address: address,
             content: content,
-            image: image,
+            images: images,
         })
 
         posts.save()
-            .then(result => {
+            .then(() => {
                 return res.status(200).json({
                     code: 0,
                     status: true,
@@ -43,8 +43,20 @@ const PostsController = {
     },
     // /show/new
     new(req, res) {
-        Posts.find().sort({ createdAt: -1 }).limit(1)
+        Posts.aggregate([
+            {
+                $lookup: {
+                    from: 'profiles',
+                    localField: 'username',
+                    foreignField: 'username',
+                    as: 'profile',
+                }
+            }
+        ])
+            .sort({ createdAt: -1 })
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
+                Func.SimpleProfileInPosts(req, result)
                 res.status(200).json({
                     code: 0,
                     status: true,
@@ -66,19 +78,17 @@ const PostsController = {
         Posts.aggregate([
             {
                 $lookup: {
-                    from: 'photosminis',
-                    localField: 'image',
-                    foreignField: '_id',
-                    as: 'images',
+                    from: 'profiles',
+                    localField: 'username',
+                    foreignField: 'username',
+                    as: 'profile',
                 }
-            },
-            {
-                $limit: parseInt(5)
-            },
+            }
         ])
             .sort({ like: -1 })
             .then(result => {
                 Func.SimpleArrayPhotos(req, result)
+                Func.SimpleProfileInPosts(req, result)
                 res.status(200).json({
                     code: 0,
                     status: true,
@@ -160,7 +170,7 @@ const PostsController = {
                     msg: 'There is a problem with the system, please try again later!',
                 })
             })
-    }
+    },
 }
 
 module.exports = PostsController

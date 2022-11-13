@@ -1,8 +1,7 @@
-const Photos = require('../models/Photos')
+
 const Tour = require('../models/Tour')
 const slug = require('slug')
 const Func = require('../../func')
-const PhotosMini = require('../models/PhotosMini')
 
 const TourController = {
     // [GET] /tour
@@ -25,7 +24,7 @@ const TourController = {
             sale: req.tour.sale,
             area_slug: req.tour.area_slug,
             rating_id: req.rating._id,
-            images_id: req.photos._id,
+            images: req.keys,
             time_start: req.tour.time_start,
             time_end: req.tour.time_end,
             address_start: req.tour.address_start,
@@ -49,59 +48,22 @@ const TourController = {
             })
     },
 
-    // update schedule
-    schedule(req, res) {
-        Tour.findByIdAndUpdate(req.body.id, {
-            "$push": {
-                schedule: {
-                    title: req.body.title,
-                    date: req.body.date,
-                    details: req.body.details,
-                }
-            }
-        })
-            .then(tour => {
-                return res.status(200).json({
-                    code: 0,
-                    status: true,
-                    msg: 'You update schedule tour success!',
-                    date: tour
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    code: 0,
-                    status: false,
-                    msg: 'You update schedule tour faild!',
-                    err: err
-                })
-            })
-    },
-
     // [GET] tour/:username/:limit/:skip
     forUsername(req, res) {
         const { username } = req.params
-        Tour.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'images_id',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-            {
-                $match: {
-                    username: username
-                }
-            }
-        ])
+        const { limit, skip } = req.params
+        const url = req.protocol + '://' + req.get('host') + `/api/v1/tour/${username}/${limit}/${parseInt(skip) + parseInt(limit)}`
+        Tour.find({
+            username: username
+        }).limit(limit).skip(skip)
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You successfully retrieved tour data.',
-                    data: TourController.convertApiSimple(req, result)
+                    next: url,
+                    data: result
                 })
             })
             .catch(err => {
@@ -114,25 +76,24 @@ const TourController = {
             })
     },
 
-    // [GET] /tour/show/all
+    // [GET] /tour/show/all/:limit/:skip
     all(req, res) {
-        console.log(req.limit, req.skip);
-        Tour.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'images_id',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-        ])//.limit(req.limit).skip(req.skip)
+        const { limit, skip } = req.params
+        const url = req.protocol + '://' + req.get('host') + `/api/v1/tour/show/all/${limit}/${parseInt(skip) + parseInt(limit)}`
+
+        Tour.find({
+            time_start: {
+                $gte: new Date(),
+            }
+        }).limit(limit).skip(skip)
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You get all tour success!',
-                    data: TourController.convertApiSimple(req, result)
+                    next: url,
+                    data: result,
                 })
             })
             .catch(err => {
@@ -148,29 +109,28 @@ const TourController = {
     // [GET] /tour/show/last-tour/:distance | 5
     lastTour(req, res) {
         const day = Func.BetweenTwoDays.nextDays(Date.now(), req.distance)
-        Tour.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'images_id',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-            {
-                $match: {
+
+        Tour.find({
+            $and: [
+                {
                     time_start: {
-                        $lt: day,
+                        $lte: day,
+                    }
+                },
+                {
+                    time_start: {
+                        $gte: new Date(),
                     }
                 }
-            }
-        ])
+            ]
+        })
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You get last tour near now success!',
-                    data: TourController.convertApiSimple(req, result)
+                    data: result
                 })
             })
             .catch(err => {
@@ -185,27 +145,17 @@ const TourController = {
 
     // [GET] /tour/show/details/:slug
     details(req, res) {
-        Tour.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'images_id',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-            {
-                $match: {
-                    slug: req.slug
-                }
-            }
-        ])
+        Tour.findOne({
+            slug: req.slug
+        })
             .then(result => {
+                result = [result]
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You get details tour success!',
-                    data: TourController.convertApiSimpleDetails(req, result)
+                    data: result
                 })
             })
             .catch(err => {
@@ -220,27 +170,25 @@ const TourController = {
 
     // [GEt] /tour/show/all/area/:slug
     forArea(req, res) {
-        Tour.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'images_id',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-            {
-                $match: {
+        Tour.find({
+            $and: [
+                {
                     area_slug: req.slug
+                },
+                {
+                    time_start: {
+                        $gte: new Date(),
+                    }
                 }
-            }
-        ])
+            ]
+        })
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You get tour for area success!',
-                    data: TourController.convertApiSimple(req, result)
+                    data: result
                 })
             })
             .catch(err => {
@@ -255,27 +203,27 @@ const TourController = {
 
     // [GET] /tour/show/all/search/:keyword
     search(req, res) {
-        Tour.aggregate([{
-            $match: {
-                $text: {
-                    $search: req.keyword
+        Tour.find({
+            $and: [
+                {
+                    $text: {
+                        $search: req.keyword
+                    },
                 },
-            }
-        }, {
-            $lookup: {
-                from: 'photosminis',
-                localField: 'images_id',
-                foreignField: '_id',
-                as: 'images',
-            }
-        },
-        ])
+                {
+                    time_start: {
+                        $gte: new Date(),
+                    }
+                }
+            ]
+        })
             .then(result => {
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You search tour success!',
-                    data: TourController.convertApiSimple(req, result)
+                    data: result
                 })
             })
             .catch(err => {
@@ -310,75 +258,6 @@ const TourController = {
                     msg: 'You rating faild!',
                     err: err
                 })
-            })
-    },
-
-    // func convert mongodb to api simple
-    convertApiSimple(req, result) {
-        const url = req.protocol + '://' + req.get('host')
-        var newResult = []
-        result.map(e => {
-            const { images, thumb, images_id, schedule, rating_id, follow_id, __v, ...others } = e
-            var newImages = []
-            var newThumb = ''
-            images[0].data.map(e => {
-                newImages.push(url + '/api/v1/views/show/photos/' + e.title)
-                return
-            })
-            newThumb = newImages[0]
-            newResult.push({
-                ...others,
-                thumb: newThumb,
-            })
-        })
-        return newResult
-    },
-
-    // func convert mongodb to api simple details
-    convertApiSimpleDetails(req, result) {
-        const url = req.protocol + '://' + req.get('host')
-        var newResult = []
-        result.map(e => {
-            const { images, thumb, images_id, schedule, rating_id, follow_id, __v, ...others } = e
-            var newImages = []
-            var newThumb = ''
-            images[0].data.map(e => {
-                newImages.push(url + '/api/v1/views/show/photos/' + e.title)
-            })
-            newThumb = newImages[0]
-            newResult.push({
-                ...others,
-                thumb: newThumb,
-                images: newImages,
-                schedule: schedule,
-            })
-        })
-        return newResult
-    },
-
-    // delete
-    delete(req, res) {
-        Tour.findByIdAndDelete(req.body.id)
-            .then(result => {
-                PhotosMini.findByIdAndDelete(result.images_id)
-                    .then(result => {
-                        const { data } = result
-                        data.map(e => {
-                            Photos.findOneAndDelete({
-                                title: e.title
-                            })
-                                .then(() => {
-                                    console.log('delete photos: ', e.title);
-                                })
-                        })
-                        return res.status(200).json({
-                            code: 0,
-                            status: true,
-                            msg: 'You rating success!',
-                            data: result
-                        })
-                    })
-
             })
     },
 }

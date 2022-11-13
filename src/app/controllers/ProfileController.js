@@ -1,6 +1,5 @@
 
 const Profile = require('../models/Profile')
-const PhotosMini = require('../models/PhotosMini')
 const Func = require('../../func')
 
 const ProfileController = {
@@ -27,11 +26,13 @@ const ProfileController = {
             sex: sex,
             country: country,
             address: address,
-            image: req.photos._id,
+            images: req.keys,
         })
 
         profile.save()
             .then(result => {
+                result = [result]
+                Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
@@ -52,22 +53,11 @@ const ProfileController = {
     details(req, res) {
         const { username } = req.params
 
-        Profile.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'image',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-            {
-                $match: {
-                    username: username
-                }
-            }
-        ])
+        Profile.findOne({
+            username: username
+        })
             .then(result => {
+                result = [result]
                 Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
@@ -89,28 +79,16 @@ const ProfileController = {
     // [POST] ~/show/all/:limit/:skip
     all(req, res) {
         const { limit, skip } = req.params
-        Profile.aggregate([
-            {
-                $lookup: {
-                    from: 'photosminis',
-                    localField: 'image',
-                    foreignField: '_id',
-                    as: 'images',
-                }
-            },
-            {
-                $limit: parseInt(limit)
-            },
-            {
-                $skip: parseInt(skip)
-            }
-        ])
+        const url = req.protocol + '://' + req.get('host') + `/api/v1/profile/show/all/${limit}/${parseInt(skip) + parseInt(limit)}`
+
+        Profile.find().limit(limit).skip(skip)
             .then(result => {
                 Func.SimpleArrayPhotos(req, result)
                 return res.status(200).json({
                     code: 0,
                     status: true,
                     msg: 'You show all profile success!',
+                    next: url,
                     data: result
                 })
             })
@@ -126,7 +104,7 @@ const ProfileController = {
 
     // [PUT] ~/update
     update(req, res) {
-        const {fullname, phone, birthday, sex, country, address } = req.body
+        const { fullname, phone, birthday, sex, country, address } = req.body
         const { id, username } = req.user
 
         Profile.findOneAndUpdate({
@@ -136,7 +114,7 @@ const ProfileController = {
             phone: phone,
             birthday: birthday,
             sex: sex,
-            country: country,   
+            country: country,
             address: address,
         })
             .then(result => {
@@ -153,7 +131,7 @@ const ProfileController = {
                     msg: 'You update profile faild!',
                 })
             })
-    }
+    },
 }
 
 module.exports = ProfileController

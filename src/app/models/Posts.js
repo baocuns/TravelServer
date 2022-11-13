@@ -13,9 +13,9 @@ const Posts = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
+    images: {
+        type: Array,
+        default: null
     },
     like: {
         type: Number,
