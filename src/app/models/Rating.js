@@ -1,10 +1,13 @@
 const mongoose = require('mongoose')
 
-const Rate = new mongoose.Schema({
-    user: {
-        user_id: mongoose.Schema.Types.ObjectId,
-        name: String,
-        thumb: String,
+const Rating = new mongoose.Schema({
+    username: {
+        type: String,
+        require: true,
+    },
+    parent_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: true,
     },
     content: {
         type: String,
@@ -18,14 +21,4 @@ const Rate = new mongoose.Schema({
     timestamps: true
 })
 
-const Rating = new mongoose.Schema({
-    totalRated: [],
-    data: [Rate]
-}, {
-    timestamps: true
-})
-
-const Ratings = mongoose.model('Rating', Rating)
-const Rates = mongoose.model('Rate', Rate)
-
-module.exports = {Ratings, Rates}
+module.exports = mongoose.model('Rating', Rating)

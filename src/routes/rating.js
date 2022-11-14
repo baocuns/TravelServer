@@ -5,8 +5,8 @@ const middlewareAuth = require('../app/middleware/auth')
 
 const router = express.Router()
 
-router.post('/insert', middlewareAuth.verifyTokenUserAndAdminAuth, RatingMiddleware.insert, RatingController.insert)
-router.post('/show', RatingMiddleware.show, RatingController.show)
+router.post('/store', middlewareAuth.verifyUserAuth, RatingMiddleware.insert, RatingController.store)
+router.get('/show/:parent_id', RatingMiddleware.show, RatingController.show)
 
 router.use('/', RatingController.index)
 

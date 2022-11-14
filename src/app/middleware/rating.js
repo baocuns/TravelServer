@@ -1,40 +1,49 @@
-const { Ratings, Rates } = require('../models/Rating')
+const Rating = require('../models/Rating')
 
 const RatingMiddleware = {
     insert(req, res, next) {
-        const { rating_id, user_id, content, rate } = req.body
-        if (!rating_id || !user_id || !content || !rate) {
+        const { parent_id, content, rate } = req.body
+        const { id, username } = req.user
+        if (!parent_id || !content || !rate) {
             return res.status(404).json({
                 code: 0,
                 status: false,
                 msg: 'Data cannot be empty or not valid!',
             })
         }
-
-        Ratings.findById(rating_id)
+        Rating.find({
+            $and: [
+                {
+                    parent_id: parent_id
+                },
+                {
+                    username: username
+                }
+            ]
+        })
             .then(result => {
-                if (!result) {
-                    return res.status(501).json({
+                if (result.length !== 0) {
+                    return res.status(404).json({
                         code: 0,
                         status: false,
-                        msg: 'Rating not exists!',
+                        msg: 'You have already rated it, best regards!',
                     })
                 }
-                req.rating = result
                 next()
             })
             .catch(err => {
                 return res.status(500).json({
                     code: 0,
                     status: false,
-                    msg: 'There was a problem adding information, please try again!',
+                    msg: 'The server is having problems, please try again!',
+                    err: err
                 })
             })
     },
     show(req, res, next) {
-        const { rating_id } = req.body
+        const { parent_id } = req.params
 
-        if (!rating_id) {
+        if (!parent_id) {
             return res.status(404).json({
                 code: 0,
                 status: false,
