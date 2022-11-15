@@ -1,4 +1,6 @@
 const Comment = require('../models/Comment')
+const mongoose = require('mongoose')
+const Func = require('../../func')
 
 const CommentController = {
     index(req, res) {
@@ -56,7 +58,7 @@ const CommentController = {
             },
             {
                 $match: {
-                    object_id: object_id
+                    object_id: mongoose.Types.ObjectId(object_id)
                 }
             }
         ])
