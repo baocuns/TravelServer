@@ -17,19 +17,11 @@ const socketio = require('./socketio')
 
 const port = 80
 
-// set origin
-var origins = ['http://localhost:3000', 'https://api.travels.games', 'http://localhost']
-var corsOptions = {
+
+app.use(cors({
   credentials: true,
-  origin: (origin, callback) => {
-    if (origins.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
-app.use(cors(corsOptions))
+  origin: ['http://localhost:3000', 'https://api.travels.games', 'http://localhost'],
+}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -57,3 +49,17 @@ server.listen(port, () => {
 // }))
 
 
+// set origin
+// var origins = ['http://localhost:3000', 'https://api.travels.games', 'http://localhost']
+// var corsOptions = {
+//   credentials: true,
+//   origin: (origin, callback) => {
+//     console.log(origin);
+//     if (origins.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }
+// app.use(cors(corsOptions))
