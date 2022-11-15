@@ -171,6 +171,16 @@ const PostsController = {
                 })
             })
     },
+    // comment ++
+    comment(req, res) {
+        const object = req.object
+        Posts.findByIdAndUpdate(object.object_id, {
+            $inc: {
+                comment: 1
+            }
+        })
+        .then().catch()
+    }
 }
 
 module.exports = PostsController
