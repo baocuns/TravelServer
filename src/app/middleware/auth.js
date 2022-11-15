@@ -38,13 +38,14 @@ const auth = {
 
     // verify token admin and current user
     verifyTokenUserAndAdminAuth(req, res, next) {
-        const username = req.params.username
         const role = 'Admin'
+        const username = req.params.username
         const uid = req.body.user_id
+        const user_id = req.headers.user_id
         const _id = req.headers._id
 
         auth.verifyToken(req, res, () => {
-            if (req.user.username === username || req.user.permissions === role || req.user.id === uid || req.user.id === _id) {
+            if (req.user.username === username || req.user.permissions === role || req.user.id === uid || req.user.id === _id || req.user.id === user_id) {
                 next()
             } else {
                 return res.status(403).json({

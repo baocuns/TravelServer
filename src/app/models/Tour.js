@@ -29,10 +29,6 @@ const Tour = new mongoose.Schema({
         type: String,
         require: true,
     },
-    rating_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: null
-    },
     follow_id: {
         type: mongoose.Schema.Types.ObjectId,
         default: null

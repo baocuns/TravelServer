@@ -17,10 +17,19 @@ const socketio = require('./socketio')
 
 const port = 80
 
-app.use(cors({
+// set origin
+var origins = ['http://localhost:3000', 'https://api.travels.games', 'http://localhost']
+var corsOptions = {
   credentials: true,
-  origin: 'https://api.travels.games', //https://api.travels.games - http://localhost
-}))
+  origin: (origin, callback) => {
+    if (origins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -42,6 +51,9 @@ server.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`)
 })
 
-
+// app.use(cors({
+//   credentials: true,
+//   origin: 'https://api.travels.games', //https://api.travels.games - http://localhost
+// }))
 
 

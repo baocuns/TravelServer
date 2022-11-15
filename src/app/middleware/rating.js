@@ -1,4 +1,5 @@
 const Rating = require('../models/Rating')
+const Profile = require('../models/Profile')
 
 const RatingMiddleware = {
     insert(req, res, next) {
@@ -11,34 +12,47 @@ const RatingMiddleware = {
                 msg: 'Data cannot be empty or not valid!',
             })
         }
-        Rating.find({
-            $and: [
-                {
-                    parent_id: parent_id
-                },
-                {
-                    username: username
-                }
-            ]
+        Profile.findOne({
+            username: username
         })
             .then(result => {
-                if (result.length !== 0) {
+                if (!result) {
                     return res.status(404).json({
                         code: 0,
                         status: false,
-                        msg: 'You have already rated it, best regards!',
+                        msg: 'Profile information data does not exist',
                     })
                 }
-                next()
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    code: 0,
-                    status: false,
-                    msg: 'The server is having problems, please try again!',
-                    err: err
+                Rating.find({
+                    $and: [
+                        {
+                            parent_id: parent_id
+                        },
+                        {
+                            username: username
+                        }
+                    ]
                 })
+                    .then(result => {
+                        if (result.length !== 0) {
+                            return res.status(404).json({
+                                code: 0,
+                                status: false,
+                                msg: 'You have already rated it, best regards!',
+                            })
+                        }
+                        next()
+                    })
+                    .catch(err => {
+                        return res.status(500).json({
+                            code: 0,
+                            status: false,
+                            msg: 'The server is having problems, please try again!',
+                            err: err
+                        })
+                    })
             })
+
     },
     show(req, res, next) {
         const { parent_id } = req.params

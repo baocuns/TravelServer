@@ -4,11 +4,10 @@ const middlewareAuth = require('../app/middleware/auth')
 const UploadMiddleware = require('../app/middleware/upload')
 const TourMiddleware = require('../app/middleware/tour')
 const PhotosController = require('../app/controllers/PhotosController')
-const RatingController = require('../app/controllers/RatingController')
 const TourController = require('../app/controllers/TourController')
 const router = express.Router()
 
-router.put('/store', UploadMiddleware.upload, middlewareAuth.verifyUserAuth, middlewareAuth.verifySuperAuth, TourMiddleware.store, PhotosController.store, RatingController.store, TourController.store, ServiceController.store)
+router.put('/store', UploadMiddleware.upload, middlewareAuth.verifyUserAuth, middlewareAuth.verifySuperAuth, TourMiddleware.store, PhotosController.store, TourController.store, ServiceController.store)
 router.get('/:username', TourController.forUsername)
 
 router.use('/', ServiceController.index)

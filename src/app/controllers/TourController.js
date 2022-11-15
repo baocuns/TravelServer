@@ -23,7 +23,6 @@ const TourController = {
             price: req.tour.price,
             sale: req.tour.sale,
             area_slug: req.tour.area_slug,
-            rating_id: req.rating._id,
             images: req.keys,
             time_start: req.tour.time_start,
             time_end: req.tour.time_end,
