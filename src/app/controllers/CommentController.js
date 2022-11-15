@@ -57,6 +57,14 @@ const CommentController = {
                 }
             },
             {
+                $lookup: {
+                    from: 'profiles',
+                    localField: 'reply',
+                    foreignField: 'username',
+                    as: 'profileReply',
+                }
+            },
+            {
                 $match: {
                     object_id: mongoose.Types.ObjectId(object_id)
                 }
