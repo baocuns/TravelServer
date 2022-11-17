@@ -47,7 +47,7 @@ const TourController = {
             })
     },
 
-    // [GET] tour/:username/:limit/:skip
+    // [GET] ~/service/:username/:limit/:skip
     forUsername(req, res) {
         const { username } = req.params
         const { limit, skip } = req.params
@@ -234,31 +234,46 @@ const TourController = {
                 })
             })
     },
+    // [PUT] ~/update/:tid -> info 
+    update(req, res) {
+        const { id, username } = req.user
+        const tid = req.tid
 
-    // update id rating to tour 
-    //[POST] ~/rating/store
-    updateIdRating(req, res) {
-        const id = req.body.parentId
-        const ratingId = req.rating._id
-        Tour.findByIdAndUpdate(id, {
-            rating_id: ratingId
+        Tour.findByIdAndUpdate(tid, {
+            $set: {
+                title: req.tour.title,
+                description: req.tour.description,
+                price: req.tour.price,
+                sale: req.tour.sale,
+                area_slug: req.tour.area_slug,
+                time_start: req.tour.time_start,
+                time_end: req.tour.time_end,
+                address_start: req.tour.address_start,
+                address_end: req.tour.address_end,
+                schedule: req.tour.schedule,
+                slug: slug(req.tour.title) + '-' + Date.now(),
+            }
         })
-            .then(result => {
+            .then(() => {
                 return res.status(200).json({
                     code: 0,
                     status: true,
-                    msg: 'You rating success!',
+                    msg: 'You have successfully updated the service!',
                 })
             })
             .catch(err => {
                 return res.status(500).json({
                     code: 0,
-                    status: true,
-                    msg: 'You rating faild!',
+                    status: false,
+                    msg: 'There is a problem with the system, please try again later!',
                     err: err
                 })
             })
     },
+    // [PUT] ~/update/:tid/photos
+    // updatePhotos(req, res) {
+
+    // }
 }
 
 module.exports = TourController

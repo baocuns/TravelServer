@@ -27,15 +27,18 @@ const PhotosController = {
         req.keys = keys
         next()
     },
-    delete(title) {
+    delete(req, res, next) {
+        const { title } = req.photos
         Photos.findOneAndDelete({
             title: title
         })
             .then(() => {
-                return true
+                req.deletePhotos = true
+                next()
             })
             .catch(() => {
-                return false
+                req.deletePhotos = false
+                next()
             })
     },
     generateKeyPhotos(files) {
