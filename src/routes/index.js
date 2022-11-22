@@ -1,4 +1,3 @@
-
 const site = require('./site')
 const auth = require('./auth')
 const area = require('./area')
@@ -13,8 +12,10 @@ const service = require('./service')
 const client = require('./client')
 const posts = require('./posts')
 const comment = require('./comment')
+const cart = require('./cart')
 
 function route(app) {
+    app.use('/api/v1/cart', cart)
     app.use('/api/v1/comment', comment)
     app.use('/api/v1/posts', posts)
     app.use('/api/v1/service', service)
