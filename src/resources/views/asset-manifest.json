@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.2e61a2fd.css",
-    "main.js": "/static/js/main.44a9446f.js",
+    "main.css": "/static/css/main.07ddc232.css",
+    "main.js": "/static/js/main.a379aa21.js",
     "static/js/787.3ce4cc4d.chunk.js": "/static/js/787.3ce4cc4d.chunk.js",
     "static/media/background.jpg": "/static/media/background.2f622b0a726d34dd049c.jpg",
     "static/media/bkktravel.svg": "/static/media/bkktravel.9f50e63a6bea4cc7f5c9cfbbbabcf903.svg",
     "static/media/bkklogo.svg": "/static/media/bkklogo.677f96c1704507e1b982e3f98b68aa67.svg",
     "static/media/bkktravel_char.svg": "/static/media/bkktravel_char.3f9845d621edc92879e521b6f21b77ee.svg",
     "index.html": "/index.html",
-    "main.2e61a2fd.css.map": "/static/css/main.2e61a2fd.css.map",
-    "main.44a9446f.js.map": "/static/js/main.44a9446f.js.map",
+    "main.07ddc232.css.map": "/static/css/main.07ddc232.css.map",
+    "main.a379aa21.js.map": "/static/js/main.a379aa21.js.map",
     "787.3ce4cc4d.chunk.js.map": "/static/js/787.3ce4cc4d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2e61a2fd.css",
-    "static/js/main.44a9446f.js"
+    "static/css/main.07ddc232.css",
+    "static/js/main.a379aa21.js"
   ]
 }
