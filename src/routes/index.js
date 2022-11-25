@@ -13,8 +13,10 @@ const client = require('./client')
 const posts = require('./posts')
 const comment = require('./comment')
 const cart = require('./cart')
+const order = require('./order')
 
 function route(app) {
+    app.use('/api/v1/order', order)
     app.use('/api/v1/cart', cart)
     app.use('/api/v1/comment', comment)
     app.use('/api/v1/posts', posts)
