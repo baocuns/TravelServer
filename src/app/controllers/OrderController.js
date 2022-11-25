@@ -315,21 +315,15 @@ const OrderController = {
     returnUrlVnpay(req, res) {
         var vnp_Params = req.query;
 
-        const status = vnp_Params['vnp_TransactionStatus']
-        const oid = vnp_Params['vnp_TxnRef']
-
-        if (status === '00') {
-            Order.findByIdAndUpdate(oid, {
-                statusCode: status,
+        if (vnp_Params['vnp_TransactionStatus'] === '00') {
+            Order.findByIdAndUpdate(vnp_Params['vnp_TxnRef'], {
+                statusCode: vnp_Params['vnp_TransactionStatus'],
                 status: 'Success'
             }).then().catch()
 
-            res.redirect('http://localhost/checkout/success')
-            // if (req.get('host') === 'api.travels.games') {
-
-            // } else {
-            //     res.json({ code: vnp_Params['vnp_ResponseCode'] })
-            // }
+            res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
+        } else {
+            res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
         }
     },
     // ipn
