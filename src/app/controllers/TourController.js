@@ -251,7 +251,7 @@ const TourController = {
                 address_start: req.tour.address_start,
                 address_end: req.tour.address_end,
                 schedule: req.tour.schedule,
-                slug: slug(req.tour.title) + '-' + Date.now(),
+                // slug: slug(req.tour.title) + '-' + Date.now(),
             }
         })
             .then(() => {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const Tour = new mongoose.Schema({
+const Tours = new mongoose.Schema({
     username: {
         type: String,
         require: true,
@@ -70,7 +70,7 @@ const Tour = new mongoose.Schema({
     timestamps: true
 })
 
-Tour.index({
+Tours.index({
     title: 'text',
     description: 'text',
     area_slug: 'text',
@@ -79,4 +79,11 @@ Tour.index({
     details: 'text',
 })
 
-module.exports = mongoose.model('Tour', Tour)
+const Tour = mongoose.model('Tour', Tours)
+
+Tour.watch().on('change', data => {
+    console.log(data);
+})
+
+
+module.exports = Tour
