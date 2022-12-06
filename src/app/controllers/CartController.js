@@ -130,7 +130,7 @@ const CartController = {
                 $lookup: {
                     from: "tours",
                     localField: "carts",
-                    foreignField: "slug",
+                    foreignField: "_id",
                     as: "tours"
                 }
             }, {

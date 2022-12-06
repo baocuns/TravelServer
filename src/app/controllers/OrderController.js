@@ -71,9 +71,11 @@ const OrderController = {
         var _amount = 0
         const info = 'Thanh toán dịch vụ của BKK Travel'
 
+        const ObjectIds = items.map(mongoose.Types.ObjectId)
+
         Tour.find({
-            slug: {
-                $in: items
+            _id: {
+                $in: ObjectIds
             }
         })
             .then(result => {
@@ -131,7 +133,7 @@ const OrderController = {
                 $lookup: {
                     from: "tours",
                     localField: "items",
-                    foreignField: "slug",
+                    foreignField: "_id",
                     as: "tours"
                 }
             },
