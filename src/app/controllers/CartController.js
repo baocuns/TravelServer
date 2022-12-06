@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const Cart = require('../models/Cart')
 
 const CartController = {
@@ -12,14 +13,14 @@ const CartController = {
     // ~/store
     store(req, res) {
         const { id, username } = req.user
-        const slug = req.slug
+        const tid = req.tid
 
         Cart.findOne({
             username: username
         })
             .then(result => {
                 if (result) {
-                    if (result.carts.some(e => e === slug)) {
+                    if (result.carts.some(e => e.toString() === tid)) {
                         return res.status(406).json({
                             code: 0,
                             status: false,
@@ -42,11 +43,11 @@ const CartController = {
     },
     create(req, res) {
         const { username } = req.user
-        const slug = req.slug
+        const tid = mongoose.Types.ObjectId(req.tid)
 
         const cart = new Cart({
             username: username,
-            carts: [slug]
+            carts: [tid]
         })
 
         cart.save()
@@ -68,13 +69,13 @@ const CartController = {
     },
     insert(req, res) {
         const { username } = req.user
-        const slug = req.slug
+        const tid = mongoose.Types.ObjectId(req.tid)
 
         Cart.findOneAndUpdate({
             username: username,
         }, {
             $push: {
-                carts: slug
+                carts: tid
             }
         })
             .then(() => {
@@ -96,13 +97,13 @@ const CartController = {
     // ~/delete
     delete(req, res) {
         const { username } = req.user
-        const slug = req.slug
+        const tid = mongoose.Types.ObjectId(req.tid)
 
         Cart.findOneAndUpdate({
             username: username
         }, {
             $pull: {
-                carts: slug
+                carts: tid
             }
         })
             .then(() => {

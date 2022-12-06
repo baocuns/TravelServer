@@ -2,9 +2,9 @@ const Tour = require('../models/Tour')
 
 const CartMiddleware = {
     validId(req, res, next) {
-        const slug = req.params.slug
+        const tid = req.params.tid
 
-        if (!slug) {
+        if (!tid) {
             return res.status(404).json({
                 code: 0,
                 status: false,
@@ -12,12 +12,10 @@ const CartMiddleware = {
             })
         }
 
-        Tour.findOne({
-            slug: slug
-        })
+        Tour.findById(tid)
             .then(result => {
                 if (result) {
-                    req.slug = slug
+                    req.tid = tid
                     next()
                 } else {
                     return res.status(404).json({
