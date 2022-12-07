@@ -87,7 +87,7 @@ const OrderController = {
                     username: username,
                     info: info,
                     amount: _amount,
-                    items: items,
+                    items: ObjectIds,
                 })
 
                 order.save()
