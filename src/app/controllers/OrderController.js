@@ -7,6 +7,65 @@ var sortObject = require('sort-object')
 const Tour = require('../models/Tour')
 const { default: mongoose } = require('mongoose')
 
+const statusCodes = [
+    {
+        key: '00',
+        value: 'Successful transaction'
+    },
+    {
+        key: '02',
+        value: 'Transaction failed due to: Customer cancels transaction'
+    },
+    {
+        key: '07',
+        value: 'Successful subtraction. Suspected transactions (related to fraud, unusual transactions)!'
+    },
+    {
+        key: '09',
+        value: `The transaction failed because: Customer's card/account has not registered for InternetBanking service at the bank!`
+    },
+    {
+        key: '10',
+        value: `The transaction failed due to: The customer did not verify the correct card/account information more than 3 times`
+    },
+    {
+        key: '11',
+        value: `Transaction failed due to: Expired pending payment. Please repeat the transaction`
+    },
+    {
+        key: '12',
+        value: `Transaction failed due to: Card/Customer's Account is locked.`
+    },
+    {
+        key: '13',
+        value: `The transaction failed because you entered the wrong password for transaction authentication (OTP). Please repeat the transaction.`
+    },
+    {
+        key: '24',
+        value: `Transaction failed due to: Customer cancels transaction`
+    },
+    {
+        key: '51',
+        value: `The transaction failed due to: Your account does not have enough balance to make the transaction.`
+    },
+    {
+        key: '65',
+        value: `The transaction failed due to: Your account has exceeded the daily transaction limit.`
+    },
+    {
+        key: '75',
+        value: `Payment bank is under maintenance.`
+    },
+    {
+        key: '79',
+        value: `Transaction failed due to: Customer entered wrong payment password more than specified number of times. Please repeat the transaction`
+    },
+    {
+        key: '79',
+        value: `Transaction failed due to: Customer entered wrong payment password more than specified number of times. Please repeat the transaction`
+    },
+]
+
 
 const OrderController = {
     index(req, res) {
@@ -317,20 +376,23 @@ const OrderController = {
     returnUrlVnpay(req, res) {
         var vnp_Params = req.query;
 
-        if (vnp_Params['vnp_TransactionStatus'] === '00') {
-            Order.findByIdAndUpdate(vnp_Params['vnp_TxnRef'], {
-                statusCode: vnp_Params['vnp_TransactionStatus'],
-                status: 'Success'
-            }).then().catch()
-
-            res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
-        } else {
-            Order.findByIdAndUpdate(vnp_Params['vnp_TxnRef'], {
-                statusCode: vnp_Params['vnp_TransactionStatus'],
-            }).then().catch()
-
-            res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
+        var status = ''
+        statusCodes.forEach(e => {
+            if (e.key === vnp_Params['vnp_TransactionStatus']) {
+                status = e.value
+                return
+            }
+        });
+        if (status === '') {
+            status = 'An unknown error'
         }
+
+        Order.findByIdAndUpdate(vnp_Params['vnp_TxnRef'], {
+            statusCode: vnp_Params['vnp_TransactionStatus'],
+            status: status
+        }).then().catch()
+
+        res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
     },
     // ipn
     IpnVnpay(req, res) {
