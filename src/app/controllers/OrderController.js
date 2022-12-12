@@ -325,6 +325,10 @@ const OrderController = {
 
             res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
         } else {
+            Order.findByIdAndUpdate(vnp_Params['vnp_TxnRef'], {
+                statusCode: vnp_Params['vnp_TransactionStatus'],
+            }).then().catch()
+
             res.redirect(`${req.protocol}://${req.get('host')}/order/${vnp_Params['vnp_TxnRef']}`)
         }
     },
