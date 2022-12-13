@@ -22,13 +22,13 @@ const PostsMiddleware = {
             })
         }
 
-        // var AR = ''
-        // if (address) {
-        //     AR = address
-        // }
+        var AR = ''
+        if (address) {
+            AR = address
+        }
 
         req.posts = {
-            address: address,
+            address: AR,
             content: content,
         }
         next()
