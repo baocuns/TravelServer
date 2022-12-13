@@ -20,7 +20,7 @@ const PostsController = {
         const posts = new Posts({
             username: username,
             address: address,
-            content: `${content} ${address}`,
+            content: content,
             images: images,
         })
 

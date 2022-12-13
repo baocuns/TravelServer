@@ -7,7 +7,7 @@ const Posts = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: true,
+        default: ''
     },
     content: {
         type: String,
