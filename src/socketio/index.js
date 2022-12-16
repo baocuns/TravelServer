@@ -1,4 +1,5 @@
 const Tour = require('../app/models/Tour')
+const Cart = require('../app/models/Cart')
 
 
 const connect = (io) => {
@@ -16,6 +17,9 @@ const connect = (io) => {
 
     Tour.watch().on('change', () => {
         io.emit('on-change', 'tour')
+    })
+    Cart.watch().on('change', () => {
+        io.emit('on-change', 'cart')
     })
 }
 
