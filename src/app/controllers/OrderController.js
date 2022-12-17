@@ -427,6 +427,53 @@ const OrderController = {
         else {
             res.status(200).json({ RspCode: '97', Message: 'Fail checksum' })
         }
+    },
+
+    // ------------------------------- ADMIN --------------------------------
+    showAllBySuper(req, res) {
+        const { username } = req.user
+        Tour.find({
+            username: username
+        })
+            .then(result => {
+                if (result) {
+                    var tourIds = []
+                    result.map(tour => {
+                        const { _id } = tour
+                        tourIds.push(_id)
+                    })
+                    const tourObjectIds = tourIds.map(mongoose.Types.ObjectId)
+                    Order.find({
+                        items: {
+                            $in: tourObjectIds
+                        }
+                    })
+                        .then(rs => {
+                            return res.status(200).json({
+                                code: 0,
+                                status: true,
+                                msg: 'Your order has been successfully placed!',
+                                data: rs
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                code: 0,
+                                status: false,
+                                msg: 'There is a problem with the system, please try again later!',
+                                err: err
+                            })
+                        })
+                }
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    code: 0,
+                    status: false,
+                    msg: 'There is a problem with the system, please try again later!',
+                    err: err
+                })
+            })
     }
 }
 
