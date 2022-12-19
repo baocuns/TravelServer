@@ -11,12 +11,10 @@ const connect = (io) => {
         socket.on('disconnect', () => {
             console.log('user disconnected: ', socket.id);
         });
-
-        
     });
 
-    Tour.watch().on('change', () => {
-        io.emit('on-change', 'tour')
+    Tour.watch().on('change', (data) => {
+        io.emit('on-change', data)
     })
     Cart.watch().on('change', () => {
         io.emit('on-change', 'cart')
