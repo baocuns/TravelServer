@@ -2,14 +2,14 @@
   "name": "travel",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "index.js",
   "engines": {
     "node": "16.x"
   },
   "scripts": {
-    "dev": "nodemon --inspect src/index.js",
-    "start": "node src/index.js",
-    "watch": "node-sass --watch src/resources/scss --output src/public/css",
+    "dev": "nodemon --inspect index.js",
+    "start": "node index.js",
+    "watch": "node-sass --watch resources/scss --output public/css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

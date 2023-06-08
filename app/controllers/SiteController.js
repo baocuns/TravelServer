@@ -40,7 +40,7 @@ class SiteController {
     // views/photos/:slug
     photos(req, res) {
         try {
-            const img = fs.readFileSync('src/public/uploads/' + req.params.slug);
+            const img = fs.readFileSync('public/uploads/' + req.params.slug);
             const encode_img = img.toString('base64');
             const final_img = {
                 contentType: req.params.slug.split('.')[1],
